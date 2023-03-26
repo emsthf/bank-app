@@ -37,6 +37,12 @@ public class SecurityConfig {
                 .and()
                 .formLogin().disable()
                 .httpBasic().disable()  // 브라우저 팝업창을 이용해서 사용자 인증 비활성
+                .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+//                    response.setContentType("application/json; charset=utf-8");
+                    response.setStatus(403);
+                    response.getWriter().println("error");
+                })
+                .and()
                 .authorizeRequests()
                 .antMatchers("/api/s/**").authenticated()
                 .antMatchers("/api/admin/**").hasRole("" + UserEnum.ADMIN)  // 최근 공식문서 상에는 ROLE_ 프리픽스 안붙여도 됨
