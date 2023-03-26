@@ -7,21 +7,20 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import shop.sol.bank.config.dummy.DummyObject;
 import shop.sol.bank.domain.user.User;
-import shop.sol.bank.domain.user.UserEnum;
 import shop.sol.bank.domain.user.UserRepository;
-import shop.sol.bank.service.UserService.JoinReqDto;
-import shop.sol.bank.service.UserService.JoinResDto;
+import shop.sol.bank.dto.user.UserReqDto.JoinReqDto;
+import shop.sol.bank.dto.user.UserResDto.JoinResDto;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)  // 서비스를 테스트할 때. Spring 관련 Bean들이 하나도 없는 환경!!
-class UserServiceTest {
+class UserServiceTest extends DummyObject {
 
     @InjectMocks  // @Mock으로 생성한 가짜를 주입하는 곳
     private UserService userService;
@@ -45,16 +44,7 @@ class UserServiceTest {
         when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
 //        when(userRepository.findByUsername(any())).thenReturn(Optional.of(new User()));
 
-        User ssol = User.builder()
-                .id(1L)
-                .username("ssol")
-                .password("1234")
-                .email("ssol@naver.com")
-                .fullname("솔")
-                .role(UserEnum.CUSTOMER)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        User ssol = newMockUser(1L, "ssol", "솔");
         when(userRepository.save(any())).thenReturn(ssol);
 
         // when
