@@ -19,6 +19,7 @@ class SecurityConfigTest {
     @Autowired
     private MockMvc mvc;
 
+    // 서버는 일관성 있게 에러가 리턴되어야 한다.
     @Test
     public void authentication_test() throws Exception {
         // given
@@ -31,16 +32,21 @@ class SecurityConfigTest {
         System.out.println("httpStatusCode = " + httpStatusCode);
 
         //then
-
+        assertEquals(401, httpStatusCode);
     }
 
     @Test
-    void authorization_test() {
+    void authorization_test() throws Exception {
         // given
 
         // when
+        ResultActions resultActions = mvc.perform(get("/api/admin/hello"));
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        int httpStatusCode = resultActions.andReturn().getResponse().getStatus();
+        System.out.println("responseBody = " + responseBody);
+        System.out.println("httpStatusCode = " + httpStatusCode);
 
         //then
-
+        assertEquals(401, httpStatusCode);
     }
 }
