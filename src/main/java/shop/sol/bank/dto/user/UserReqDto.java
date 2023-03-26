@@ -5,13 +5,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserEnum;
 
+import javax.validation.constraints.NotEmpty;
+
 public class UserReqDto {
 
     @Data
     public static class JoinReqDto {
+        @NotEmpty
         private String username;
+        @NotEmpty
         private String password;
+        @NotEmpty
         private String email;
+        @NotEmpty
         private String fullname;
 
         public User toEntity(BCryptPasswordEncoder passwordEncoder) {
