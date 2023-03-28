@@ -9,12 +9,20 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-public class UserReqDto {
+public class UserRequestDto {
 
     @Data
-    public static class JoinReqDto {
-        // 영문, 숫자는 되고, 길이 최소 2~20자 이내
+    public static class LoginRequestDto {
+        // 이 Dto는 컨트롤러를 가기 전 필터에서 사용되므로 Validation 어노테이션 불가능
+        private String username;
+        private String password;
+    }
 
+
+    @Data
+    public static class JoinRequestDto {
+        // Validation은 컨트롤러에서 검사하는 것이다.
+        // 영문, 숫자는 되고, 길이 최소 2~20자 이내
         @NotEmpty
         @Pattern(regexp = "^[a-zA-Z0-9]{2,10}$", message = "영문/숫자 2~20자 이내로 작성해주세요")
         private String username;

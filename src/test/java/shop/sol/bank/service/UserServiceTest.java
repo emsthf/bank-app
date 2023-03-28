@@ -10,8 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.sol.bank.config.dummy.DummyObject;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
-import shop.sol.bank.dto.user.UserReqDto.JoinReqDto;
-import shop.sol.bank.dto.user.UserResDto.JoinResDto;
+import shop.sol.bank.dto.user.UserRequestDto.JoinRequestDto;
+import shop.sol.bank.dto.user.UserResponseDto.JoinResponseDto;
 
 import java.util.Optional;
 
@@ -34,11 +34,11 @@ class UserServiceTest extends DummyObject {
     @Test
     void 회원가입() throws Exception {
         //given
-        JoinReqDto joinReqDto = new JoinReqDto();
-        joinReqDto.setUsername("ssol");
-        joinReqDto.setPassword("1234");
-        joinReqDto.setEmail("ssol@naver.com");
-        joinReqDto.setFullname("솔");
+        JoinRequestDto joinRequestDto = new JoinRequestDto();
+        joinRequestDto.setUsername("ssol");
+        joinRequestDto.setPassword("1234");
+        joinRequestDto.setEmail("ssol@naver.com");
+        joinRequestDto.setFullname("솔");
 
         // stub
         when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
@@ -48,11 +48,11 @@ class UserServiceTest extends DummyObject {
         when(userRepository.save(any())).thenReturn(ssol);
 
         // when
-        JoinResDto joinResDto = userService.joinMember(joinReqDto);
-        System.out.println("joinResDto = " + joinResDto);
+        JoinResponseDto joinResponseDto = userService.joinMember(joinRequestDto);
+        System.out.println("joinResDto = " + joinResponseDto);
 
         // then
-        assertEquals(joinResDto.getId(), 1L);
-        assertEquals(joinResDto.getUsername(), "ssol");
+        assertEquals(joinResponseDto.getId(), 1L);
+        assertEquals(joinResponseDto.getUsername(), "ssol");
     }
 }

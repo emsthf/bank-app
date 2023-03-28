@@ -42,6 +42,6 @@ public class ValidationAdvice {
                 }
             }
         }
-        return proceedingJoinPoint.proceed();  // 정삭적으로 해당 메서드를 실행.
+        return proceedingJoinPoint.proceed();  // 정상적으로 해당 메서드를 실행.
     }
 }
