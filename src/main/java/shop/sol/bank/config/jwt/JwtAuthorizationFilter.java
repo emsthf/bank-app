@@ -30,7 +30,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             LoginUser loginUser = JwtProcess.verify(token);
 
             // 임시 세션 (UserDetails 타입 or username)
-            Authentication authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(loginUser, null,
+                    loginUser.getAuthorities());  // id와 role만 존재
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         }
