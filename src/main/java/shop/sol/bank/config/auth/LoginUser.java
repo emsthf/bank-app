@@ -1,4 +1,4 @@
-package shop.sol.bank.config.dummy.auth;
+package shop.sol.bank.config.auth;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

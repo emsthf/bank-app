@@ -10,7 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import shop.sol.bank.config.dummy.auth.LoginUser;
+import shop.sol.bank.config.auth.LoginUser;
 import shop.sol.bank.dto.user.UserResponseDto.LoginResponseDto;
 import shop.sol.bank.util.CustomResponseUtil;
 

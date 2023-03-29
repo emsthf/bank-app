@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import shop.sol.bank.config.dummy.auth.LoginUser;
+import shop.sol.bank.config.auth.LoginUser;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserEnum;
 

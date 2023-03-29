@@ -7,11 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import shop.sol.bank.config.dummy.auth.LoginUser;
+import shop.sol.bank.config.auth.LoginUser;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserEnum;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

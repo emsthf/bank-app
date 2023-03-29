@@ -1,4 +1,4 @@
-package shop.sol.bank.config.dummy.auth;
+package shop.sol.bank.config.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;

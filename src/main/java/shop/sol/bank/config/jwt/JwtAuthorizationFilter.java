@@ -7,7 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import shop.sol.bank.config.dummy.auth.LoginUser;
+import shop.sol.bank.config.auth.LoginUser;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

@@ -1,7 +1,7 @@
 package shop.sol.bank.config.jwt;
 
 import org.junit.jupiter.api.Test;
-import shop.sol.bank.config.dummy.auth.LoginUser;
+import shop.sol.bank.config.auth.LoginUser;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserEnum;
 
