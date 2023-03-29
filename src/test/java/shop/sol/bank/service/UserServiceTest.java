@@ -40,10 +40,11 @@ class UserServiceTest extends DummyObject {
         joinRequestDto.setEmail("ssol@naver.com");
         joinRequestDto.setFullname("솔");
 
-        // stub
+        // stub 1
         when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
 //        when(userRepository.findByUsername(any())).thenReturn(Optional.of(new User()));
 
+        // stub 2
         User ssol = newMockUser(1L, "ssol", "솔");
         when(userRepository.save(any())).thenReturn(ssol);
 
