@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import shop.sol.bank.config.dummy.auth.LoginUser;
-import shop.sol.bank.dto.user.UserResponseDto;
 import shop.sol.bank.dto.user.UserResponseDto.LoginResponseDto;
 import shop.sol.bank.util.CustomResponseUtil;
 
@@ -19,10 +18,9 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 
-import static shop.sol.bank.dto.user.UserRequestDto.*;
+import static shop.sol.bank.dto.user.UserRequestDto.LoginRequestDto;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
