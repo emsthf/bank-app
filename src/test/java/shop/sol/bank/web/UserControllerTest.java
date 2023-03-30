@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc  // MockMvc 객체를 자동 구성. 추가 코드 작성 없이 25~26 라인의 MockMvc 객체를 사용할 수 있다.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserControllerTest extends DummyObject {

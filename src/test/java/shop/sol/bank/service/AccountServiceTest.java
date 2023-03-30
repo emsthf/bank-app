@@ -45,7 +45,7 @@ class AccountServiceTest extends DummyObject {
         accountSaveRequestDto.setNumber(1111L);
         accountSaveRequestDto.setPassword(1234L);
 
-        // stub 1
+        // stub 1 (준비 단계)
         User ssol = newMockUser(userId, "ssol", "솔");
         when(userRepository.findById(any())).thenReturn(Optional.of(ssol));
 
