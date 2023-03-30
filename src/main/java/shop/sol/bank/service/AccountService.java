@@ -1,5 +1,6 @@
 package shop.sol.bank.service;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,10 @@ import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
 import shop.sol.bank.handler.ex.CustomApiException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -37,5 +41,39 @@ public class AccountService {
 
         // Dto를 응답
         return new AccountSaveResponseDto(accountPS);
+    }
+
+    public AccountListResponseDto getAccountByUser(Long userId) {
+        User userPS = userRepository.findById(userId).orElseThrow(() -> new CustomApiException("유저를 찾을 수 없습니다"));
+
+        // 유저의 모든 계좌목록
+        List<Account> accountListPS = accountRepository.findByUser_id(userId);
+        return new AccountListResponseDto(userPS, accountListPS);
+    }
+
+    @Data
+    public static class AccountListResponseDto {
+        private String fullname;
+        private List<AccountDto> accounts = new ArrayList<>();
+
+        public AccountListResponseDto(User user, List<Account> accounts) {
+            this.fullname = user.getFullname();
+            this.accounts = accounts.stream()
+                    .map(AccountDto::new)
+                    .collect(Collectors.toList());
+        }
+
+        @Data
+        public class AccountDto {
+            private Long id;
+            private Long number;
+            private Long balance;
+
+            public AccountDto(Account account) {
+                this.id = account.getId();
+                this.number = account.getNumber();
+                this.balance = account.getBalance();
+            }
+        }
     }
 }

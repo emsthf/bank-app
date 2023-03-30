@@ -46,8 +46,8 @@ class AccountControllerTest extends DummyObject {
     // JWT token -> 인증필터 -> 시큐리티 세션생성
     // setupBefore=TEST_METHOD (setUp 메서드 실행 전에 수행)
     // setupBefore=TEST_EXECUTION (saveAccount_test 메서드 실행 전에 수행)
-    @WithUserDetails(value = "ssol", setupBefore = TestExecutionEvent.TEST_EXECUTION)  // DB에서 username=ssol로 조회해서 세션 담아주는 어노테이션
     @Test
+    @WithUserDetails(value = "ssol", setupBefore = TestExecutionEvent.TEST_EXECUTION)  // DB에서 username=ssol로 조회해서 세션 담아주는 어노테이션
     void saveAccount_test() throws Exception {
         // given
         AccountSaveRequestDto accountSaveRequestDto = new AccountSaveRequestDto();
