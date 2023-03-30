@@ -3,6 +3,8 @@ package shop.sol.bank.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc  // MockMvc 객체를 자동 구성
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK)
 class AccountControllerTest extends DummyObject {
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private MockMvc mvc;
@@ -60,9 +63,23 @@ class AccountControllerTest extends DummyObject {
         ResultActions resultActions = mvc
                 .perform(post("/api/s/account").content(requestBody).contentType(MediaType.APPLICATION_JSON));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
-        System.out.println("responseBody = " + responseBody);
+        log.debug("responseBody = " + responseBody);
 
         // then
         resultActions.andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithUserDetails(value = "ssol", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void findUserAccount() throws Exception {
+        // given
+
+        // when
+        ResultActions resultActions = mvc.perform(get("/api/s/account/login-user"));
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        log.debug("responseBody = " + responseBody);
+
+        // then
+        resultActions.andExpect(status().isOk());
     }
 }
