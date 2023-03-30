@@ -4,13 +4,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import shop.sol.bank.config.jwt.JwtAuthenticationFilter;
+import shop.sol.bank.config.jwt.JwtAuthorizationFilter;
 import shop.sol.bank.domain.user.UserEnum;
 import shop.sol.bank.util.CustomResponseUtil;
 
@@ -26,6 +31,19 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // JWT 필터 등록
+    public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
+        @Override
+        public void configure(HttpSecurity builder) throws Exception {
+            // AuthenticationManager에 접근해서 강제 세션 로그인
+            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
+            // 필터 추가
+            builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
+            builder.addFilter(new JwtAuthorizationFilter(authenticationManager));
+            super.configure(builder);
+        }
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.debug("디버그: filterChain 빈 등록됨");
@@ -38,8 +56,14 @@ public class SecurityConfig {
                 .and()
                 .formLogin().disable()
                 .httpBasic().disable()  // 브라우저 팝업창을 이용해서 사용자 인증 비활성
-                .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
-                    CustomResponseUtil.unAuthentication(response, "로그인을 진행해 주세요");
+                .apply(new CustomSecurityFilterManager())  // 필터 적용
+                .and()
+                .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {  // 인증 실패 처리
+                    CustomResponseUtil.fail(response, "로그인을 진행해 주세요", HttpStatus.UNAUTHORIZED);
+                })
+                .and()
+                .exceptionHandling().accessDeniedHandler((request, response, e) -> {  // 권한 실패
+                    CustomResponseUtil.fail(response, "권한이 없습니다", HttpStatus.FORBIDDEN);
                 })
                 .and()
                 .authorizeRequests()

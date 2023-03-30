@@ -30,3 +30,4 @@ spring:
 logging:
   level:
     shop.sol.bank: DEBUG
+    org.hibernate.type: TRACE

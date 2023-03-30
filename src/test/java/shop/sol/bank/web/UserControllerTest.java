@@ -8,14 +8,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import shop.sol.bank.config.dummy.DummyObject;
 import shop.sol.bank.domain.user.UserRepository;
-import shop.sol.bank.dto.user.UserReqDto.JoinReqDto;
+import shop.sol.bank.dto.user.UserRequestDto.JoinRequestDto;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
+@Transactional
+@AutoConfigureMockMvc  // MockMvc 객체를 자동 구성. 추가 코드 작성 없이 25~26 라인의 MockMvc 객체를 사용할 수 있다.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserControllerTest extends DummyObject {
@@ -38,13 +40,13 @@ class UserControllerTest extends DummyObject {
     @Order(1)
     void join_success_test() throws Exception {
         // given
-        JoinReqDto joinReqDto = new JoinReqDto();
-        joinReqDto.setUsername("park");
-        joinReqDto.setPassword("1234");
-        joinReqDto.setEmail("park@gmail.com");
-        joinReqDto.setFullname("박박박");
+        JoinRequestDto joinRequestDto = new JoinRequestDto();
+        joinRequestDto.setUsername("park");
+        joinRequestDto.setPassword("1234");
+        joinRequestDto.setEmail("park@gmail.com");
+        joinRequestDto.setFullname("박박박");
 
-        String requestBody = om.writeValueAsString(joinReqDto);
+        String requestBody = om.writeValueAsString(joinRequestDto);
 //        System.out.println("requestBody = " + requestBody);
 
         // when
@@ -62,13 +64,13 @@ class UserControllerTest extends DummyObject {
     void join_fail_test() throws Exception {
         // given
         // 중복 이름으로 회원가입
-        JoinReqDto joinReqDto = new JoinReqDto();
-        joinReqDto.setUsername("kim");
-        joinReqDto.setPassword("1234");
-        joinReqDto.setEmail("kim@gmail.com");
-        joinReqDto.setFullname("김김김");
+        JoinRequestDto joinRequestDto = new JoinRequestDto();
+        joinRequestDto.setUsername("kim");
+        joinRequestDto.setPassword("1234");
+        joinRequestDto.setEmail("kim@gmail.com");
+        joinRequestDto.setFullname("김김김");
 
-        String requestBody = om.writeValueAsString(joinReqDto);
+        String requestBody = om.writeValueAsString(joinRequestDto);
 //        System.out.println("requestBody = " + requestBody);
 
         // when
