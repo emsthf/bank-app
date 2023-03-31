@@ -17,9 +17,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import shop.sol.bank.config.dummy.DummyObject;
+import shop.sol.bank.domain.account.Account;
+import shop.sol.bank.domain.account.AccountRepository;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.handler.ex.CustomApiException;
+
+import javax.persistence.EntityManager;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -41,9 +46,19 @@ class AccountControllerTest extends DummyObject {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private EntityManager em;
+
     @BeforeEach
     void setUp() {
-        User user = userRepository.save(newUser("ssol", "솔"));
+        User ssol = userRepository.save(newUser("ssol", "솔"));
+        User kim = userRepository.save(newUser("kim", "김"));
+        Account ssolAccount1 = accountRepository.save(newAccount(1111L, ssol));
+        Account kimAccount1 = accountRepository.save(newAccount(2222L, kim));
+        em.clear();  // Persistence Context를 비워줌
     }
 
     // JWT token -> 인증필터 -> 시큐리티 세션생성
@@ -81,5 +96,30 @@ class AccountControllerTest extends DummyObject {
 
         // then
         resultActions.andExpect(status().isOk());
+    }
+
+    /*
+     * 테스트시에는 insert한 것이 모두 Persistence Context에 올라감 (영속화)
+     * 영속화 된 것을 초기화 해주는 것이 실제 실행 모드와 동일한 환경으로 테스트를 하는 것!
+     * 최초 select는 쿼리가 발생하지만 Persistence Context에 있으면 1차 캐시를 함\
+     * Lazy 로딩은 쿼리도 발생안함 - Persistence Context에 있다면!
+     * Lazy 로딩할 때 Persistence Context에 없다면 쿼리가 발생함
+     */
+    @Test
+    @WithUserDetails(value = "ssol", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void deleteAccount_test() throws Exception {
+        // given
+        Long number = 1111L;
+
+        // when
+        ResultActions resultActions = mvc.perform(delete("/api/s/account/" + number));
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        log.debug("responseBody = " + responseBody);
+
+        // then
+        // JUnit 테스트에서 delete 쿼리는 DB관련(DML)으로 가장 마지막에 실행되면 발동안함
+        assertThrows(CustomApiException.class, () -> accountRepository.findByNumber(number).orElseThrow(
+                () -> new CustomApiException("계좌를 찾을 수 없습니다")
+        ));
     }
 }
