@@ -7,9 +7,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import shop.sol.bank.domain.user.User;
+import shop.sol.bank.handler.ex.CustomApiException;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor
@@ -52,5 +54,11 @@ public class Account {
         this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public void checkOwner(Long userId) {
+        if (!Objects.equals(user.getId(), userId)) {
+            throw new CustomApiException("계좌 소유자가 아닙니다.");  // 리턴해주는 것 보다 바로 에러 던지는게 편하다.
+        }
     }
 }

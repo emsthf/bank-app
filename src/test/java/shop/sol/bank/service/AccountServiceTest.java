@@ -13,10 +13,12 @@ import shop.sol.bank.domain.account.AccountRepository;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.handler.ex.CustomApiException;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
@@ -63,5 +65,23 @@ class AccountServiceTest extends DummyObject {
 
         // then
         assertEquals(1111L, accountSaveResponseDto.getNumber());
+    }
+
+    @Test
+    void deleteAccount_test() throws Exception {
+        // given
+        Long number = 1111L;
+        Long userId = 2L;
+
+        // stub (삭제에 필요한 가짜 유저와 계좌 생성. findByNumber()는 JPA에서 만들어주는 query method이기 때문에 테스트 할 필요 없다.)
+        User ssol = newMockUser(1L, "ssol", "솔");
+        Account ssolAccount = newMockAccount(1L, 1111L, 1000L, ssol);
+        when(accountRepository.findByNumber(any())).thenReturn(Optional.of(ssolAccount));
+
+        // when
+
+
+        // then (Service의 1.계좌 확인과 3.계좌 삭제는 Repository의 역할이므로 검증을 할 필요가 없다. 그러니 2.계좌 소유자 확인 과정만 테스트 하면 됨)
+        assertThrows(CustomApiException.class, () -> accountService.deleteAccount(number, userId));  // deleteAccount()의 결과 CustomApiException 예외가 발생 될 것을 기대
     }
 }

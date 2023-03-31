@@ -1,6 +1,5 @@
 package shop.sol.bank.service;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,13 +8,12 @@ import shop.sol.bank.domain.account.AccountRepository;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.dto.account.AccountResponseDto.AccountListResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
 import shop.sol.bank.handler.ex.CustomApiException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -51,29 +49,15 @@ public class AccountService {
         return new AccountListResponseDto(userPS, accountListPS);
     }
 
-    @Data
-    public static class AccountListResponseDto {
-        private String fullname;
-        private List<AccountDto> accounts = new ArrayList<>();
+    @Transactional
+    public void deleteAccount(Long number, Long userId) {
+        // 1. 계좌 확인
+        Account accountPS = accountRepository.findByNumber(number).orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
 
-        public AccountListResponseDto(User user, List<Account> accounts) {
-            this.fullname = user.getFullname();
-            this.accounts = accounts.stream()
-                    .map(AccountDto::new)
-                    .collect(Collectors.toList());
-        }
+        // 2. 계좌 소유자 확인
+        accountPS.checkOwner(userId);
 
-        @Data
-        public class AccountDto {
-            private Long id;
-            private Long number;
-            private Long balance;
-
-            public AccountDto(Account account) {
-                this.id = account.getId();
-                this.number = account.getNumber();
-                this.balance = account.getBalance();
-            }
-        }
+        // 3. 계좌 삭제
+        accountRepository.deleteById(accountPS.getId());
     }
 }
