@@ -15,7 +15,7 @@ public class DummyObject {
         return User.builder()
                 .username(username)
                 .password(encPassword)
-                .email(username + "@naver.com")
+                .email(username + "@gmail.com")
                 .fullname(fullname)
                 .role(UserEnum.CUSTOMER)
                 .build();
@@ -28,7 +28,7 @@ public class DummyObject {
                 .id(id)
                 .username(username)
                 .password(encPassword)
-                .email(username + "@naver.com")
+                .email(username + "@gmail.com")
                 .fullname(fullname)
                 .role(UserEnum.CUSTOMER)
                 .createdAt(LocalDateTime.now())
