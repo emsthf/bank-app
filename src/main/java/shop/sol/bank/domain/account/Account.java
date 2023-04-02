@@ -63,4 +63,8 @@ public class Account {
             throw new CustomApiException("계좌 소유자가 아닙니다.");  // 리턴해주는 것 보다 바로 에러 던지는게 편하다.
         }
     }
+
+    public void deposit(Long amount) {
+        balance = balance + amount;
+    }
 }

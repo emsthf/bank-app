@@ -83,4 +83,28 @@ public class RegxTest {
         System.out.println("result = " + result);
         assertTrue(result);
     }
+
+    @Test
+    void account_division_regex() {
+        String division = "DEPOSIT";
+        boolean result = Pattern.matches("^(DEPOSIT)$", division);
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
+
+    @Test
+    void tel_regex1() {
+        String tel = "010-2222-3333";
+        boolean result = Pattern.matches("^[0-9]{3}-[0-9]{4}-[0-9]{4}", tel);
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
+
+    @Test
+    void tel_regex2() {
+        String tel = "01022223333";
+        boolean result = Pattern.matches("^[0-9]{11}", tel);
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
 }
