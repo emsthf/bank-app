@@ -8,15 +8,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shop.sol.bank.config.auth.LoginUser;
 import shop.sol.bank.dto.ResponseDto;
+import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.dto.account.AccountResponseDto.AccountDepositResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountListResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
 import shop.sol.bank.service.AccountService;
-import shop.sol.bank.service.AccountService.AccountDepositRequestDto;
 
 import javax.validation.Valid;
-
-import static shop.sol.bank.service.AccountService.*;
 
 @RestController
 @RequestMapping("/api")

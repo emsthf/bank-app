@@ -2,6 +2,8 @@ package shop.sol.bank.config.dummy;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.sol.bank.domain.account.Account;
+import shop.sol.bank.domain.transaction.Transaction;
+import shop.sol.bank.domain.transaction.TransactionEnum;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserEnum;
 
@@ -52,6 +54,26 @@ public class DummyObject {
                 .password(1234L)
                 .balance(balance)
                 .user(user)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    // 계좌 1111L 잔액 1000원
+    // 입급 트랜잭션 -> 잔액 1100원 변경 -> 입급 트랜잭션 히스토리가 생성되어야 함
+    protected Transaction newMockDepositTransaction(Long id, Account account) {
+        account.deposit(100L);
+        return Transaction.builder()
+                .id(id)
+                .withdrawAccount(null)
+                .depositAccount(account)
+                .withdrawAccountBalance(null)
+                .depositAccountBalance(account.getBalance())
+                .amount(100L)
+                .division(TransactionEnum.DEPOSIT)
+                .sender("ATM")
+                .receiver(account.getNumber() + "")
+                .tel("01088889999")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
