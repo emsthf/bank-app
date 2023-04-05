@@ -21,6 +21,7 @@ import shop.sol.bank.domain.account.Account;
 import shop.sol.bank.domain.account.AccountRepository;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
+import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
 import shop.sol.bank.handler.ex.CustomApiException;
 
@@ -121,5 +122,27 @@ class AccountControllerTest extends DummyObject {
         assertThrows(CustomApiException.class, () -> accountRepository.findByNumber(number).orElseThrow(
                 () -> new CustomApiException("계좌를 찾을 수 없습니다")
         ));
+    }
+
+    @Test
+    void depositAccount_test() throws Exception {
+        // given
+        AccountDepositRequestDto accountDepositRequestDto = new AccountDepositRequestDto();
+        accountDepositRequestDto.setNumber(1111L);
+        accountDepositRequestDto.setAmount(100L);
+        accountDepositRequestDto.setDivision("DEPOSIT");
+        accountDepositRequestDto.setTel("01044448888");
+
+        String requestBody = om.writeValueAsString(accountDepositRequestDto);
+        log.debug("테스트 : " + requestBody);
+
+        // when
+        ResultActions resultActions = mvc
+                .perform(post("/api/account/deposit").content(requestBody).contentType(MediaType.APPLICATION_JSON));
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        log.debug("테스트 : " + responseBody);
+
+        // then
+        resultActions.andExpect(status().isCreated());
     }
 }
