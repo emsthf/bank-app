@@ -23,11 +23,12 @@ import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.dto.account.AccountRequestDto.AccountWithdrawRequestDto;
 import shop.sol.bank.handler.ex.CustomApiException;
 
 import javax.persistence.EntityManager;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -144,5 +145,28 @@ class AccountControllerTest extends DummyObject {
 
         // then
         resultActions.andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithUserDetails(value = "ssol", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void withdrawAccount_test() throws Exception {
+        // given
+        AccountWithdrawRequestDto accountWithdrawRequestDto = new AccountWithdrawRequestDto();
+        accountWithdrawRequestDto.setNumber(1111L);
+        accountWithdrawRequestDto.setPassword(1234L);
+        accountWithdrawRequestDto.setAmount(100L);
+        accountWithdrawRequestDto.setDivision("WITHDRAW");
+
+        String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
+        log.debug("테스트 : " + requestBody);
+
+        // when
+        ResultActions resultActions = mvc
+                .perform(post("/api/s/account/withdraw").content(requestBody).contentType(MediaType.APPLICATION_JSON));
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        log.debug("테스트 : " + responseBody);
+
+        // then
+
     }
 }
