@@ -51,6 +51,7 @@ public class AccountResponseDto {
         }
     }
 
+    // 입금은 인증이 안되어 있어서 잔액 확인 불가
     @Data
     public static class AccountDepositResponseDto {
         private Long id;  // 계좌 id
@@ -83,6 +84,41 @@ public class AccountResponseDto {
                 this.amount = transaction.getAmount();
                 this.depositAccountBalance = transaction.getDepositAccountBalance();
                 this.tel = transaction.getTel();
+                this.createdAt = CustomDateUtil.toStringFormat(transaction.getCreatedAt());
+            }
+        }
+    }
+
+    // DTO가 depoist과 똑같아도 재사용하지 않기 (나중에 만약에 출금할 때 조금 DTO가 달라져야 하면 DTO를 공유하고 있을 때 수정 잘못하면 망해... - 독립적으로 만들어야 함)
+    @Data
+    public static class AccountWithdrawResponseDto {
+        private Long id;  // 계좌 id
+        private Long number;  // 계좌번호
+        private Long balance;  // 잔액
+        private TransactionDto transaction;  // dto 안에 entity가 들어오면 안되므로
+
+        public AccountWithdrawResponseDto(Account account, Transaction transaction) {
+            this.id = account.getId();
+            this.number = account.getNumber();
+            this.balance = account.getBalance();
+            this.transaction = new TransactionDto(transaction);  // entity를 받아서 dto로 변환
+        }
+
+        @Data
+        public class TransactionDto {
+            private Long id;
+            private String division;
+            private String sender;
+            private String receiver;
+            private Long amount;
+            private String createdAt;
+
+            public TransactionDto(Transaction transaction) {
+                this.id = transaction.getId();
+                this.division = transaction.getDivision().getValue();
+                this.sender = transaction.getSender();
+                this.receiver = transaction.getReceiver();
+                this.amount = transaction.getAmount();
                 this.createdAt = CustomDateUtil.toStringFormat(transaction.getCreatedAt());
             }
         }

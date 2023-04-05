@@ -12,9 +12,11 @@ import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.dto.account.AccountRequestDto.AccountWithdrawRequestDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountDepositResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountListResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
+import shop.sol.bank.dto.account.AccountResponseDto.AccountWithdrawResponseDto;
 import shop.sol.bank.handler.ex.CustomApiException;
 
 import java.util.List;
@@ -76,26 +78,66 @@ public class AccountService {
         }
 
         // 입금계좌 확인
-        Account depositAccountPs = accountRepository.findByNumber(accountDepositRequestDto.getNumber())
+        Account depositAccountPS = accountRepository.findByNumber(accountDepositRequestDto.getNumber())
                 .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다"));
 
         // 입금(해당 계좌 balance 조정 - update문. 더티체킹)
-        depositAccountPs.deposit(accountDepositRequestDto.getAmount());
+        depositAccountPS.deposit(accountDepositRequestDto.getAmount());
 
         // 거래내역 남기기
         Transaction transaction = Transaction.builder()
-                .depositAccount(depositAccountPs)
                 .withdrawAccount(null)
-                .depositAccountBalance(depositAccountPs.getBalance())
+                .depositAccount(depositAccountPS)
                 .withdrawAccountBalance(null)
+                .depositAccountBalance(depositAccountPS.getBalance())
                 .amount(accountDepositRequestDto.getAmount())
                 .division(TransactionEnum.DEPOSIT)
                 .sender("ATM")
                 .receiver(accountDepositRequestDto.getNumber() + "")
                 .tel(accountDepositRequestDto.getTel())
                 .build();
-
         Transaction transactionPS = transactionRepository.save(transaction);
-        return new AccountDepositResponseDto(depositAccountPs, transactionPS);
+
+        return new AccountDepositResponseDto(depositAccountPS, transactionPS);
+    }
+
+    @Transactional
+    public AccountWithdrawResponseDto withdrawAccount(AccountWithdrawRequestDto accountWithdrawRequestDto, Long userId) {
+        // 0원 체크
+        if (accountWithdrawRequestDto.getAmount() <= 0L) {
+            throw new CustomApiException("0원 이하의 금액을 출금할 수 없습니다");
+        }
+
+        // 출금계좌 확인
+        Account withdrawAccountPS = accountRepository.findByNumber(accountWithdrawRequestDto.getNumber())
+                .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다"));
+
+        // 출금 소유자 확인 (로그인한 사람과 동일한지)
+        withdrawAccountPS.checkOwner(userId);
+
+        // 출금계좌 비밀번호 확인
+        withdrawAccountPS.checkSamePassword(accountWithdrawRequestDto.getPassword());
+
+        // 출금계좌 잔액 확인
+        withdrawAccountPS.checkBalance(accountWithdrawRequestDto.getAmount());
+
+        // 출금하기
+        withdrawAccountPS.withdraw(accountWithdrawRequestDto.getAmount());
+
+        // 거래내역 남기기 (내 계좌에서 ATM으로 출금)
+        Transaction transaction = Transaction.builder()
+                .withdrawAccount(withdrawAccountPS)
+                .depositAccount(null)
+                .withdrawAccountBalance(withdrawAccountPS.getBalance())
+                .depositAccountBalance(null)
+                .amount(accountWithdrawRequestDto.getAmount())
+                .division(TransactionEnum.WITHDRAW)
+                .sender(accountWithdrawRequestDto.getNumber() + "")
+                .receiver("ATM")
+                .build();
+        Transaction transactionPS = transactionRepository.save(transaction);
+
+        // DTO 응답
+        return new AccountWithdrawResponseDto(withdrawAccountPS, transactionPS);
     }
 }

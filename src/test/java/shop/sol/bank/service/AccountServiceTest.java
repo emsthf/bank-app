@@ -176,6 +176,28 @@ class AccountServiceTest extends DummyObject {
     }
 
     // Todo 계좌 출금 테스트
+    @Test
+    void withdrawAccount_test() throws Exception {
+        // given
+        Long amount = 100L;
+        Long password = 1234L;
+        Long userId = 1L;
+
+        User ssol = newMockUser(1L, "ssol", "솔");
+        Account ssolAccount = newMockAccount(1L, 1111L, 1000L, ssol);
+
+        // when
+        if (amount <= 0L) {
+            throw new CustomApiException("0원 이하의 금액을 출금할 수 없습니다");
+        }
+        ssolAccount.checkOwner(userId);
+        ssolAccount.checkSamePassword(password);
+//        ssolAccount.checkBalance(amount);
+        ssolAccount.withdraw(amount);
+
+        // then
+        assertThat(ssolAccount.getBalance()).isEqualTo(900L);
+    }
 
     // Todo 계좌 이체 테스트
 
