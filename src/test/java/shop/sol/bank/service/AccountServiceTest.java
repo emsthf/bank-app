@@ -107,12 +107,13 @@ class AccountServiceTest extends DummyObject {
         accountDepositRequestDto.setTel("01044448888");
 
         // stub 1
-        User ssol = newMockUser(1L, "ssol", "솔");  // 실행됨
-        Account ssolAccount1 = newMockAccount(1L, 1111L, 1000L, ssol);  // 실행됨. ssolAccount1 -> 1000원
+        User ssol1 = newMockUser(1L, "ssol", "솔");  // 실행됨
+        Account ssolAccount1 = newMockAccount(1L, 1111L, 1000L, ssol1);  // 실행됨. ssolAccount1 -> 1000원
         when(accountRepository.findByNumber(any())).thenReturn(Optional.of(ssolAccount1));  // 실행안됨. service 호출 후 실행됨 -> 1100원
 
-        // stub 2 (스텁이 진행될 때마다 연관된 객체는 새로 만들어서 주입하기 - 타이밍 때문에 꼬인다.)
-        Account ssolAccount2 = newMockAccount(1L, 1111L, 1000L, ssol);
+        // stub 2 (스텁이 진행될 때마다 연관된 객체는 새로 만들어서 주입하기 - 타이밍 때문에 꼬인다. stub끼리 완전 독립적으로 만들어야 한다.)
+        User ssol2 = newMockUser(1L, "ssol", "솔");  // stub 2에 유저가 필요하다면 새로 만들어야 함
+        Account ssolAccount2 = newMockAccount(1L, 1111L, 1000L, ssol2);  // stub 2에 Account가 필요하다면 새로 만들어야 함
         Transaction transaction = newMockDepositTransaction(1L, ssolAccount2);
         when(transactionRepository.save(any())).thenReturn(transaction);
 
@@ -125,4 +126,60 @@ class AccountServiceTest extends DummyObject {
         assertThat(ssolAccount1.getBalance()).isEqualTo(1100L);  // ssolAccount1이 deposit이 되는지 테스트
         assertThat(accountDepositResponseDto.getTransaction().getDepositAccountBalance()).isEqualTo(1100L);
     }
+
+    @Test
+    void depositAccount_test2() throws Exception {
+        // given
+        AccountDepositRequestDto accountDepositRequestDto = new AccountDepositRequestDto();
+        accountDepositRequestDto.setNumber(1111L);
+        accountDepositRequestDto.setAmount(100L);
+        accountDepositRequestDto.setDivision("DEPOSIT");
+        accountDepositRequestDto.setTel("01044448888");
+
+        // stub 1
+        User ssol1 = newMockUser(1L, "ssol", "솔");
+        Account ssolAccount1 = newMockAccount(1L, 1111L, 1000L, ssol1);
+        when(accountRepository.findByNumber(any())).thenReturn(Optional.of(ssolAccount1));
+
+        // stub 2
+        User ssol2 = newMockUser(1L, "ssol", "솔");
+        Account ssolAccount2 = newMockAccount(1L, 1111L, 1000L, ssol2);
+        Transaction transaction = newMockDepositTransaction(1L, ssolAccount2);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+        
+        // when
+        AccountDepositResponseDto accountDepositResponseDto = accountService.depositAccount(accountDepositRequestDto);
+        String responseBody = om.writeValueAsString(accountDepositResponseDto);
+        log.debug("테스트 : " + responseBody);
+
+        // then
+        assertThat(ssolAccount1.getBalance()).isEqualTo(1100L);
+    }
+
+    // 서비스를 테스트 하고 싶으면, 내가 지금 무엇을 여기서 테스트해야할지 명확히 구분해야 한다.(책임 분리)
+    // DTO 생성 테스트는 컨트롤러 테스트에서도 가능하니까 컨트롤러 테스트로 넘기고, DB 관련은 서비스 것이 아니기에 굳이 여기서 볼 필요 없을 수도 있다.
+    // 물론 서비스에 연관관계에 따라서 내가 체크해야할 수 많은 로직들이 있다면 stub을 하나씩 만들면서 정석대로 해야하겠지만 상황에 따라 더 간편하게 서비스를 테스트 할 수도 있다.
+    @Test
+    void depositAccount_test3() throws Exception {
+        // given
+        Account account = newMockAccount(1L, 1111L, 1000L, null);
+        Long amount = 100L;
+
+        // when
+        if (amount <= 0L) {
+            throw new CustomApiException("0원 이하의 금액을 입금할 수 없습니다");
+        }
+        account.deposit(100L);
+
+        // then
+        assertThat(account.getBalance()).isEqualTo(1100L);
+    }
+
+    // Todo 계좌 출금 테스트
+
+    // Todo 계좌 이체 테스트
+
+    // Todo 유저별 계좌 목록보기 테스트
+
+    // Todo 계좌 상세보기 테스트
 }
