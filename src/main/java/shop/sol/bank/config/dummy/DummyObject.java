@@ -2,6 +2,7 @@ package shop.sol.bank.config.dummy;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.sol.bank.domain.account.Account;
+import shop.sol.bank.domain.account.AccountRepository;
 import shop.sol.bank.domain.transaction.Transaction;
 import shop.sol.bank.domain.transaction.TransactionEnum;
 import shop.sol.bank.domain.user.User;
@@ -76,6 +77,66 @@ public class DummyObject {
                 .tel("01088889999")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    protected Transaction newDepositTransaction(Account account, AccountRepository accountRepository) {
+        account.deposit(100L);  // 1000원이 있었다면 900원이 됨
+
+        // Repository Test에서는 더티체킹 됨
+        // Controller Test에서는 더티체킹 안됨
+        // 어디선 되고 어디선 안되면 그냥 모든 곳에서 되도록 만들어라. 더티체킹을 신경쓰지말고 강제 save해서 내가 제어권을 가지면 됨.
+        if (accountRepository != null) {
+            accountRepository.save(account);
+        }
+        return Transaction.builder()
+                .withdrawAccount(null)
+                .depositAccount(account)
+                .withdrawAccountBalance(null)
+                .depositAccountBalance(account.getBalance())
+                .amount(100L)
+                .division(TransactionEnum.DEPOSIT)
+                .sender("ATM")
+                .receiver(account.getNumber() + "")
+                .tel("01022227777")
+                .build();
+    }
+
+    protected Transaction newWithdrawTransaction(Account account, AccountRepository accountRepository) {
+        account.withdraw(100L);  // 1000원이 있었다면 1100원이 됨
+
+        if (accountRepository != null) {
+            accountRepository.save(account);
+        }
+        return Transaction.builder()
+                .withdrawAccount(account)
+                .depositAccount(null)
+                .withdrawAccountBalance(account.getBalance())
+                .depositAccountBalance(null)
+                .amount(100L)
+                .division(TransactionEnum.WITHDRAW)
+                .sender(account.getNumber() + "")
+                .receiver("ATM")
+                .build();
+    }
+
+    protected Transaction newTransferTransaction(Account withdrawAccount, Account depositAccount, AccountRepository accountRepository) {
+        withdrawAccount.withdraw(100L);
+        depositAccount.deposit(100L);
+
+        if (accountRepository != null) {
+            accountRepository.save(withdrawAccount);
+            accountRepository.save(depositAccount);
+        }
+        return Transaction.builder()
+                .withdrawAccount(withdrawAccount)
+                .depositAccount(depositAccount)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccountBalance(depositAccount.getBalance())
+                .amount(100L)
+                .division(TransactionEnum.TRANSFER)
+                .sender(withdrawAccount.getNumber() + "")
+                .receiver(depositAccount.getNumber() + "")
                 .build();
     }
 }
