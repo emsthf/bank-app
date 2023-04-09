@@ -21,8 +21,10 @@ import shop.sol.bank.domain.account.Account;
 import shop.sol.bank.domain.account.AccountRepository;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
+import shop.sol.bank.dto.account.AccountRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.dto.account.AccountRequestDto.AccountTransferRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountWithdrawRequestDto;
 import shop.sol.bank.handler.ex.CustomApiException;
 
@@ -167,6 +169,30 @@ class AccountControllerTest extends DummyObject {
         log.debug("테스트 : " + responseBody);
 
         // then
+        resultActions.andExpect(status().isCreated());
+    }
 
+    @Test
+    @WithUserDetails(value = "ssol", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void transferAccount_test() throws Exception {
+        // given
+        AccountTransferRequestDto accountTransferRequestDto = new AccountTransferRequestDto();
+        accountTransferRequestDto.setWithdrawNumber(1111L);
+        accountTransferRequestDto.setDepositNumber(2222L);
+        accountTransferRequestDto.setWithdrawPassword(1234L);
+        accountTransferRequestDto.setAmount(100L);
+        accountTransferRequestDto.setDivision("TRANSFER");
+
+        String requestBody = om.writeValueAsString(accountTransferRequestDto);
+        log.debug("테스트 : " + requestBody);
+
+        // when
+        ResultActions resultActions = mvc
+                .perform(post("/api/s/account/transfer").content(requestBody).contentType(MediaType.APPLICATION_JSON));
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        log.debug("테스트 : " + responseBody);
+
+        // then
+        resultActions.andExpect(status().isCreated());
     }
 }

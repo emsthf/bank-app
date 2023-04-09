@@ -12,11 +12,9 @@ import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.dto.account.AccountRequestDto.AccountTransferRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountWithdrawRequestDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountDepositResponseDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountListResponseDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountWithdrawResponseDto;
+import shop.sol.bank.dto.account.AccountResponseDto.*;
 import shop.sol.bank.handler.ex.CustomApiException;
 
 import java.util.List;
@@ -139,5 +137,54 @@ public class AccountService {
 
         // DTO 응답
         return new AccountWithdrawResponseDto(withdrawAccountPS, transactionPS);
+    }
+
+    public AccountTransferResponseDto transferAccount(AccountTransferRequestDto accountTransferRequestDto, Long userId) {
+        // 출금계좌와 입금계좌가 동일하면 안됨
+        if (accountTransferRequestDto.getWithdrawNumber().longValue() == accountTransferRequestDto.getDepositNumber().longValue()) {
+            throw new CustomApiException("입출금계조가 동이로할 수 없습니다");
+        }
+
+        // 0원 체크
+        if (accountTransferRequestDto.getAmount() <= 0L) {
+            throw new CustomApiException("0원 이하의 금액을 출금할 수 없습니다");
+        }
+
+        // 출금계좌 확인
+        Account withdrawAccountPS = accountRepository.findByNumber(accountTransferRequestDto.getWithdrawNumber())
+                .orElseThrow(() -> new CustomApiException("출금계좌를 찾을 수 없습니다"));
+
+        // 입금계좌 확인
+        Account depositAccountPS = accountRepository.findByNumber(accountTransferRequestDto.getDepositNumber())
+                .orElseThrow(() -> new CustomApiException("입금계좌를 찾을 수 없습니다"));
+
+        // 출금계좌 소유자 확인 (로그인한 사람과 동일한지)
+        withdrawAccountPS.checkOwner(userId);
+
+        // 출금계좌 비밀번호 확인
+        withdrawAccountPS.checkSamePassword(accountTransferRequestDto.getWithdrawPassword());
+
+        // 출금계좌 잔액 확인
+        withdrawAccountPS.checkBalance(accountTransferRequestDto.getAmount());
+
+        // 이체하기
+        withdrawAccountPS.withdraw(accountTransferRequestDto.getAmount());
+        depositAccountPS.deposit(accountTransferRequestDto.getAmount());
+
+        // 거래내역 남기기
+        Transaction transaction = Transaction.builder()
+                .withdrawAccount(withdrawAccountPS)
+                .depositAccount(depositAccountPS)
+                .withdrawAccountBalance(withdrawAccountPS.getBalance())
+                .depositAccountBalance(depositAccountPS.getBalance())
+                .amount(accountTransferRequestDto.getAmount())
+                .division(TransactionEnum.TRANSFER)
+                .sender(accountTransferRequestDto.getWithdrawNumber() + "")
+                .receiver(accountTransferRequestDto.getDepositNumber() + "")
+                .build();
+        Transaction transactionPS = transactionRepository.save(transaction);
+
+        // DTO 응답
+        return new AccountTransferResponseDto(withdrawAccountPS, transactionPS);
     }
 }

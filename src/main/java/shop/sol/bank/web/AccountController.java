@@ -8,11 +8,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shop.sol.bank.config.auth.LoginUser;
 import shop.sol.bank.dto.ResponseDto;
-import shop.sol.bank.dto.account.AccountRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
+import shop.sol.bank.dto.account.AccountRequestDto.AccountTransferRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountWithdrawRequestDto;
-import shop.sol.bank.dto.account.AccountResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountDepositResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountListResponseDto;
 import shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
@@ -20,6 +19,8 @@ import shop.sol.bank.dto.account.AccountResponseDto.AccountWithdrawResponseDto;
 import shop.sol.bank.service.AccountService;
 
 import javax.validation.Valid;
+
+import static shop.sol.bank.dto.account.AccountResponseDto.AccountTransferResponseDto;
 
 @RestController
 @RequestMapping("/api")
@@ -58,5 +59,12 @@ public class AccountController {
                                              BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser) {
         AccountWithdrawResponseDto accountWithdrawResponseDto = accountService.withdrawAccount(accountWithdrawRequestDto, loginUser.getUser().getId());
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌 입금 완료", accountWithdrawResponseDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/s/account/transfer")
+    public ResponseEntity<?> transferAccount(@RequestBody @Valid AccountTransferRequestDto accountTransferRequestDto,
+                                             BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser) {
+        AccountTransferResponseDto accountTransferResponseDto = accountService.transferAccount(accountTransferRequestDto, loginUser.getUser().getId());
+        return new ResponseEntity<>(new ResponseDto<>(1, "계좌 이체 완료", accountTransferResponseDto), HttpStatus.CREATED);
     }
 }

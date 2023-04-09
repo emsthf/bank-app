@@ -200,6 +200,41 @@ class AccountServiceTest extends DummyObject {
     }
 
     // Todo 계좌 이체 테스트
+    @Test
+    void transferAccount_test() throws Exception {
+        // given
+        Long userId = 1L;
+        AccountTransferRequestDto accountTransferRequestDto = new AccountTransferRequestDto();
+        accountTransferRequestDto.setWithdrawNumber(1111L);
+        accountTransferRequestDto.setDepositNumber(2222L);
+        accountTransferRequestDto.setWithdrawPassword(1234L);
+        accountTransferRequestDto.setAmount(100L);
+        accountTransferRequestDto.setDivision("TRANSFER");
+
+        User ssol = newMockUser(1L, "ssol", "솔");
+        User kim = newMockUser(2L, "kim", "김");
+        Account withdrawAccount = newMockAccount(1L, 1111L, 1000L, ssol);
+        Account depositAccount = newMockAccount(2L, 2222L, 1000L, kim);
+
+        // when
+        if (accountTransferRequestDto.getWithdrawNumber().longValue() == accountTransferRequestDto.getDepositNumber().longValue()) {
+            throw new CustomApiException("입출금계조가 동이로할 수 없습니다");
+        }
+
+        if (accountTransferRequestDto.getAmount() <= 0L) {
+            throw new CustomApiException("0원 이하의 금액을 출금할 수 없습니다");
+        }
+        withdrawAccount.checkOwner(userId);
+        withdrawAccount.checkSamePassword(accountTransferRequestDto.getWithdrawPassword());
+        withdrawAccount.checkBalance(accountTransferRequestDto.getAmount());
+
+        withdrawAccount.withdraw(accountTransferRequestDto.getAmount());
+        depositAccount.deposit(accountTransferRequestDto.getAmount());
+
+        // then
+        assertThat(withdrawAccount.getBalance()).isEqualTo(900L);
+        assertThat(depositAccount.getBalance()).isEqualTo(1100L);
+    }
 
     // Todo 유저별 계좌 목록보기 테스트
 
