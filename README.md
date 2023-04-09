@@ -26,3 +26,6 @@ DB에서 직접 꺼낸 객체를 보존 데이터(영속화)란 의미로 persis
 ```java
 User userPS = userRepository.findByUserId(userId);
 ```
+
+## CORS 정책 변경 공식 문서
+[CORS-safelisted response header](https://developer.mozilla.org/en-US/docs/Glossary/CORS-safelisted_response_header)

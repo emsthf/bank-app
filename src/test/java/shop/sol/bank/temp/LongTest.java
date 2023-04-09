@@ -2,6 +2,9 @@ package shop.sol.bank.temp;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class LongTest {
 
     @Test
@@ -28,5 +31,34 @@ public class LongTest {
 
         // then
 
+    }
+
+    @Test
+    void long_test2() throws Exception {
+        // given
+        Long v1 = 1000L;
+        Long v2 = 1000L;
+
+        // when
+        if (v1 == v2) {
+            System.out.println("테스트 : 같습니다");
+        }
+
+        // then
+
+    }
+
+    @Test
+    void long_test3() throws Exception {
+        // given
+        Long v1 = 1280L;
+        Long v2 = 1280L;
+
+        // when
+
+
+        // then
+        assertThat(v1).isEqualTo(v2);
+        assertEquals(v2, v1);
     }
 }
