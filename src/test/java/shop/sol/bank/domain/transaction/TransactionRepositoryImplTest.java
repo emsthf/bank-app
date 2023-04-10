@@ -35,7 +35,7 @@ class TransactionRepositoryImplTest extends DummyObject {
     @BeforeEach
     void setUp() {
         autoIncrementReset();
-        dateSetting();
+        dataSetting();
         em.clear();  // 레포지토리 테스트에서 퍼시스턴스 컨텍스트 비우기는 필수!
     }
 
@@ -86,7 +86,7 @@ class TransactionRepositoryImplTest extends DummyObject {
         assertEquals(800L, transactionListPS.get(3).getDepositAccountBalance());
     }
 
-    private void dateSetting() {
+    private void dataSetting() {
         User ssar = userRepository.save(newUser("ssar", "쌀"));
         User cos = userRepository.save(newUser("cos", "코스,"));
         User love = userRepository.save(newUser("love", "러브"));

@@ -29,39 +29,39 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/s/account")
+    @PostMapping("/s/accounts")
     public ResponseEntity<?> saveAccount(@RequestBody @Valid AccountSaveRequestDto accountSaveRequestDto,
                                          BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser) {  // 인증이 되서 필터를 통과해 컨트롤러로 들어오면 @AuthenticationPrincipal 어노테이션으로 UserDetails를 바로 꺼내올 수 있다.
         AccountSaveResponseDto accountSaveResponseDto = accountService.registerAccount(accountSaveRequestDto, loginUser.getUser().getId());
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌등록 성공", accountSaveResponseDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/s/account/login-user")
+    @GetMapping("/s/accounts/login-user")
     public ResponseEntity<?> findUserAccount(@AuthenticationPrincipal LoginUser loginUser) {
         AccountListResponseDto accountListResponseDto = accountService.getAccountByUser(loginUser.getUser().getId());
         return new ResponseEntity<>(new ResponseDto<>(1, "유저 계좌목록보기 성공", accountListResponseDto), HttpStatus.OK);
     }
 
-    @DeleteMapping("/s/account/{number}")
+    @DeleteMapping("/s/accounts/{number}")
     public ResponseEntity<?> deleteAccount(@PathVariable Long number, @AuthenticationPrincipal LoginUser loginUser) {
         accountService.deleteAccount(number, loginUser.getUser().getId());
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌 삭제 완료", null), HttpStatus.OK);
     }
 
-    @PostMapping("/account/deposit")
+    @PostMapping("/accounts/deposit")
     public ResponseEntity<?> depositAccount(@RequestBody @Valid AccountDepositRequestDto accountDepositRequestDto, BindingResult bindingResult) {
         AccountDepositResponseDto accountDepositResponseDto = accountService.depositAccount(accountDepositRequestDto);
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌 입금 완료", accountDepositResponseDto), HttpStatus.CREATED);
     }
 
-    @PostMapping("/s/account/withdraw")
+    @PostMapping("/s/accounts/withdraw")
     public ResponseEntity<?> withdrawAccount(@RequestBody @Valid AccountWithdrawRequestDto accountWithdrawRequestDto,
                                              BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser) {
         AccountWithdrawResponseDto accountWithdrawResponseDto = accountService.withdrawAccount(accountWithdrawRequestDto, loginUser.getUser().getId());
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌 입금 완료", accountWithdrawResponseDto), HttpStatus.CREATED);
     }
 
-    @PostMapping("/s/account/transfer")
+    @PostMapping("/s/accounts/transfer")
     public ResponseEntity<?> transferAccount(@RequestBody @Valid AccountTransferRequestDto accountTransferRequestDto,
                                              BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser) {
         AccountTransferResponseDto accountTransferResponseDto = accountService.transferAccount(accountTransferRequestDto, loginUser.getUser().getId());

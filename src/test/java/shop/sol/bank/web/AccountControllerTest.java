@@ -21,7 +21,6 @@ import shop.sol.bank.domain.account.Account;
 import shop.sol.bank.domain.account.AccountRepository;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
-import shop.sol.bank.dto.account.AccountRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountTransferRequestDto;
@@ -80,7 +79,7 @@ class AccountControllerTest extends DummyObject {
 
         // when
         ResultActions resultActions = mvc
-                .perform(post("/api/s/account").content(requestBody).contentType(MediaType.APPLICATION_JSON));
+                .perform(post("/api/s/accounts").content(requestBody).contentType(MediaType.APPLICATION_JSON));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         log.debug("responseBody = " + responseBody);
 
@@ -94,7 +93,7 @@ class AccountControllerTest extends DummyObject {
         // given
 
         // when
-        ResultActions resultActions = mvc.perform(get("/api/s/account/login-user"));
+        ResultActions resultActions = mvc.perform(get("/api/s/accounts/login-user"));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         log.debug("responseBody = " + responseBody);
 
@@ -116,7 +115,7 @@ class AccountControllerTest extends DummyObject {
         Long number = 1111L;
 
         // when
-        ResultActions resultActions = mvc.perform(delete("/api/s/account/" + number));
+        ResultActions resultActions = mvc.perform(delete("/api/s/accounts/" + number));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         log.debug("responseBody = " + responseBody);
 
@@ -141,7 +140,7 @@ class AccountControllerTest extends DummyObject {
 
         // when
         ResultActions resultActions = mvc
-                .perform(post("/api/account/deposit").content(requestBody).contentType(MediaType.APPLICATION_JSON));
+                .perform(post("/api/accounts/deposit").content(requestBody).contentType(MediaType.APPLICATION_JSON));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         log.debug("테스트 : " + responseBody);
 
@@ -164,7 +163,7 @@ class AccountControllerTest extends DummyObject {
 
         // when
         ResultActions resultActions = mvc
-                .perform(post("/api/s/account/withdraw").content(requestBody).contentType(MediaType.APPLICATION_JSON));
+                .perform(post("/api/s/accounts/withdraw").content(requestBody).contentType(MediaType.APPLICATION_JSON));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         log.debug("테스트 : " + responseBody);
 
@@ -188,7 +187,7 @@ class AccountControllerTest extends DummyObject {
 
         // when
         ResultActions resultActions = mvc
-                .perform(post("/api/s/account/transfer").content(requestBody).contentType(MediaType.APPLICATION_JSON));
+                .perform(post("/api/s/accounts/transfer").content(requestBody).contentType(MediaType.APPLICATION_JSON));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         log.debug("테스트 : " + responseBody);
 
