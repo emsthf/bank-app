@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
-@Service
 @RequiredArgsConstructor
+@Service
 public class AccountService {
 
     private final UserRepository userRepository;

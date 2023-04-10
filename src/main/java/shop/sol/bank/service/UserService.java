@@ -14,8 +14,9 @@ import shop.sol.bank.handler.ex.CustomApiException;
 
 import java.util.Optional;
 
-@Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Service
 public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -38,3 +39,4 @@ public class UserService {
         return new JoinResponseDto(userPS);
     }
 }
+
