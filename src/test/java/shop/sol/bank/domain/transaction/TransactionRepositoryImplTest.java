@@ -36,6 +36,7 @@ class TransactionRepositoryImplTest extends DummyObject {
     void setUp() {
         autoIncrementReset();
         dateSetting();
+        em.clear();  // 레포지토리 테스트에서 퍼시스턴스 컨텍스트 비우기는 필수!
     }
 
     @Test
@@ -74,13 +75,15 @@ class TransactionRepositoryImplTest extends DummyObject {
             System.out.println("getAmount() = " + transactionPS.getAmount());
             System.out.println("getSender() = " + transactionPS.getSender());
             System.out.println("getReceiver() = " + transactionPS.getReceiver());
-            System.out.println("getDepositAccountBalance() = " + transactionPS.getDepositAccountBalance());
             System.out.println("getWithdrawAccountBalance() = " + transactionPS.getWithdrawAccountBalance());
+            System.out.println("getDepositAccountBalance() = " + transactionPS.getDepositAccountBalance());
+            System.out.println("출금 Account의 잔액 = " + transactionPS.getWithdrawAccount().getBalance());
+            System.out.println("출금계좌 유저의 Fullname = " + transactionPS.getWithdrawAccount().getUser().getFullname());
             System.out.println("===================================");
         }
 
         // then
-
+        assertEquals(800L, transactionListPS.get(3).getDepositAccountBalance());
     }
 
     private void dateSetting() {
