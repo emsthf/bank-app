@@ -22,9 +22,11 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))  // FK 제약조건 해제
     @ManyToOne(fetch = FetchType.LAZY)
     private Account withdrawAccount;  // 출금으로 변화한 기록
 
+    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))  // FK 제약조건 해제
     @ManyToOne(fetch = FetchType.LAZY)
     private Account depositAccount;  // 입금으로 변화한 기록
 

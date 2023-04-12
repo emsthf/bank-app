@@ -80,6 +80,7 @@ public class SecurityConfig {
         configuration.addAllowedMethod("*");  // 모든 http request Method 허용(=Javascript 요청 허용)
         configuration.addAllowedOriginPattern("*");  // 모든 IP 주소 허용(=프론트 IP만 허용)
         configuration.setAllowCredentials(true);  // 클라이언트에서 쿠키 요청 허용
+        configuration.addExposedHeader("Authorization");  // 옛날에는 이 옵션이 디폴트 값이어서 생략해도 됬었지만, 지금은 꼭 넣어줘야 함. 공식 문서를 확인해 보자.
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);  // 모든 주소 요청에 configuration에서 설정한 옵션을 넣어준다.

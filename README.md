@@ -22,7 +22,10 @@ private LocalDateTime updatedAt;
 ```
 
 ### PS가 붙은 변수명
-DB에서 직접 꺼낸 객체를 보존 데이터란 의미로 persistence의 약자인 PS를 붙여서 사용했음
+DB에서 직접 꺼낸 객체를 보존 데이터(영속화)란 의미로 persistence의 약자인 PS를 붙여서 사용했음
 ```java
 User userPS = userRepository.findByUserId(userId);
 ```
+
+## CORS 정책 변경 공식 문서
+[CORS-safelisted response header](https://developer.mozilla.org/en-US/docs/Glossary/CORS-safelisted_response_header)

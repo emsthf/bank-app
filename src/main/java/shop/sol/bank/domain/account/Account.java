@@ -7,9 +7,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import shop.sol.bank.domain.user.User;
+import shop.sol.bank.handler.ex.CustomApiException;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor
@@ -52,5 +54,34 @@ public class Account {
         this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public void checkOwner(Long userId) {
+//        String testUsername = user.getUsername();  // Lazy 로딩이 되어야 함
+//        System.out.println("testUsername = " + testUsername);
+        if (!Objects.equals(user.getId(), userId)) {  // Lazy 로딩이어도 id를 조회할 때는 select 쿼리가 날아가지 않는다.
+            throw new CustomApiException("계좌 소유자가 아닙니다.");  // 리턴해주는 것 보다 바로 에러 던지는게 편하다.
+        }
+    }
+
+    public void deposit(Long amount) {
+        balance = balance + amount;
+    }
+
+    public void checkSamePassword(Long password) {
+        if (this.password.longValue() != password.longValue()) {
+            throw new CustomApiException("계좌 비밀번호 검증에 실패했습니다.");
+        }
+    }
+
+    public void checkBalance(Long amount) {
+        if (this.balance < amount) {
+            throw new CustomApiException("계좌 잔액이 부족합니다");
+        }
+    }
+
+    public void withdraw(Long amount) {
+        checkBalance(amount);
+        balance = balance - amount;
     }
 }
