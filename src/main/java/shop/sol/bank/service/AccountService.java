@@ -58,7 +58,8 @@ public class AccountService {
     @Transactional
     public void deleteAccount(Long number, Long userId) {
         // 1. 계좌 확인
-        Account accountPS = accountRepository.findByNumber(number).orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
+        Account accountPS = accountRepository.findByNumber(number)
+                .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
 
         // 2. 계좌 소유자 확인
         accountPS.checkOwner(userId);
@@ -186,5 +187,21 @@ public class AccountService {
 
         // DTO 응답
         return new AccountTransferResponseDto(withdrawAccountPS, transactionPS);
+    }
+
+    public AccountDetailResponseDto findDetailAccount(Long number, Long userId, int page) {
+        // 1. 구분값, 페이지 고정
+        String division = "ALL";
+
+        // 2. 계좌 찾기
+        Account accountPS = accountRepository.findByNumber(number)
+                .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다"));
+
+        // 3. 계좌 소유자 확인
+        accountPS.checkOwner(userId);
+
+        // 4. 입출금 목록보기
+        List<Transaction> transactionList = transactionRepository.findTransactionList(accountPS.getId(), division, page);
+        return new AccountDetailResponseDto(accountPS, transactionList);
     }
 }

@@ -12,15 +12,11 @@ import shop.sol.bank.dto.account.AccountRequestDto.AccountDepositRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountTransferRequestDto;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountWithdrawRequestDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountDepositResponseDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountListResponseDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountSaveResponseDto;
-import shop.sol.bank.dto.account.AccountResponseDto.AccountWithdrawResponseDto;
 import shop.sol.bank.service.AccountService;
 
 import javax.validation.Valid;
 
-import static shop.sol.bank.dto.account.AccountResponseDto.AccountTransferResponseDto;
+import static shop.sol.bank.dto.account.AccountResponseDto.*;
 
 @RestController
 @RequestMapping("/api")
@@ -42,9 +38,9 @@ public class AccountController {
         return new ResponseEntity<>(new ResponseDto<>(1, "유저 계좌목록보기 성공", accountListResponseDto), HttpStatus.OK);
     }
 
-    @DeleteMapping("/s/accounts/{number}")
-    public ResponseEntity<?> deleteAccount(@PathVariable Long number, @AuthenticationPrincipal LoginUser loginUser) {
-        accountService.deleteAccount(number, loginUser.getUser().getId());
+    @DeleteMapping("/s/accounts/{accountNumber}")
+    public ResponseEntity<?> deleteAccount(@PathVariable Long accountNumber, @AuthenticationPrincipal LoginUser loginUser) {
+        accountService.deleteAccount(accountNumber, loginUser.getUser().getId());
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌 삭제 완료", null), HttpStatus.OK);
     }
 
@@ -66,5 +62,13 @@ public class AccountController {
                                              BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser) {
         AccountTransferResponseDto accountTransferResponseDto = accountService.transferAccount(accountTransferRequestDto, loginUser.getUser().getId());
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌 이체 완료", accountTransferResponseDto), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/s/accounts/{accountNumber}")
+    public ResponseEntity<?> findDetailAccount(@PathVariable Long accountNumber,
+                                               @RequestParam(value = "page", defaultValue = "0") int page,
+                                               @AuthenticationPrincipal LoginUser loginUser) {
+        AccountDetailResponseDto accountDetailResponseDto = accountService.findDetailAccount(accountNumber, loginUser.getUser().getId(), page);
+        return ResponseEntity.ok(new ResponseDto<>(1, "계좌상세보기 성공", accountDetailResponseDto));
     }
 }

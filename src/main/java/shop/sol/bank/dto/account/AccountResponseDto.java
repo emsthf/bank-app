@@ -7,6 +7,7 @@ import shop.sol.bank.domain.transaction.Transaction;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.util.CustomDateUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -157,6 +158,56 @@ public class AccountResponseDto {
                 this.amount = transaction.getAmount();
                 this.depositAccountBalance = transaction.getDepositAccountBalance();
                 this.createdAt = CustomDateUtil.toStringFormat(transaction.getCreatedAt());
+            }
+        }
+    }
+
+    @Data
+    public static class AccountDetailResponseDto {
+        private Long id;
+        private Long number;
+        private Long balance;
+        private List<TransactionDto> transactions = new ArrayList<>();
+
+        public AccountDetailResponseDto(Account account, List<Transaction> transactions) {
+            this.id = account.getId();
+            this.number = account.getNumber();
+            this.balance = account.getBalance();
+            this.transactions = transactions.stream()
+                    .map((transaction) -> new TransactionDto(transaction, account.getNumber())).collect(Collectors.toList());
+        }
+
+        @Data
+        public class TransactionDto {
+            private Long id;
+            private String division;
+            private Long amount;
+            private String sender;
+            private String receiver;
+            private String tel;
+            private String createdAt;
+            private Long balance;
+
+            public TransactionDto(Transaction transaction, Long accountNumber) {
+                this.id = transaction.getId();
+                this.division = transaction.getDivision().getValue();
+                this.amount = transaction.getAmount();
+                this.sender = transaction.getSender();
+                this.receiver = transaction.getReceiver();
+                this.tel = transaction.getTel() == null ? "없음" : transaction.getTel();
+                this.createdAt = CustomDateUtil.toStringFormat(transaction.getCreatedAt());
+
+                if (transaction.getDepositAccount() == null) {
+                    this.balance = transaction.getWithdrawAccountBalance();
+                } else if (transaction.getWithdrawAccount() == null) {
+                    this.balance = transaction.getDepositAccountBalance();
+                } else {
+                    if (accountNumber.longValue() == transaction.getDepositAccount().getNumber().longValue()) {
+                        this.balance = transaction.getDepositAccountBalance();
+                    } else {
+                        this.balance = transaction.getWithdrawAccountBalance();
+                    }
+                }
             }
         }
     }
