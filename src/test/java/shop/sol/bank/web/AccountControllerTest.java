@@ -31,7 +31,7 @@ import shop.sol.bank.handler.ex.CustomApiException;
 
 import javax.persistence.EntityManager;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -124,9 +124,9 @@ class AccountControllerTest extends DummyObject {
 
         // then
         // JUnit 테스트에서 delete 쿼리는 DB관련(DML)으로 가장 마지막에 실행되면 발동안함
-        assertThrows(CustomApiException.class, () -> accountRepository.findByNumber(number).orElseThrow(
-                () -> new CustomApiException("계좌를 찾을 수 없습니다")
-        ));
+        assertThatThrownBy(() -> accountRepository.findByNumber(number).orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다.")))
+                .isInstanceOf(CustomApiException.class)
+                .hasMessage("계좌를 찾을 수 없습니다.");
     }
 
     @Test

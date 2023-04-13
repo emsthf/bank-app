@@ -10,8 +10,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @Sql("classpath:db/teardown.sql")
 @ActiveProfiles("test")
@@ -36,7 +36,7 @@ class SecurityConfigTest {
         System.out.println("httpStatusCode = " + httpStatusCode);
 
         //then
-        assertEquals(401, httpStatusCode);
+        assertThat(httpStatusCode).isEqualTo(401);
     }
 
     @Test
@@ -51,6 +51,6 @@ class SecurityConfigTest {
         System.out.println("httpStatusCode = " + httpStatusCode);
 
         //then
-        assertEquals(401, httpStatusCode);
+        assertThat(httpStatusCode).isEqualTo(401);
     }
 }

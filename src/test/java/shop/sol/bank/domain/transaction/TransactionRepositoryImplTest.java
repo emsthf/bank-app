@@ -14,7 +14,7 @@ import shop.sol.bank.domain.user.UserRepository;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DataJpaTest  // DB 관련된 Bean이 다 올라간다.
@@ -83,7 +83,7 @@ class TransactionRepositoryImplTest extends DummyObject {
         }
 
         // then
-        assertEquals(800L, transactionListPS.get(3).getDepositAccountBalance());
+        assertThat(transactionListPS.get(3).getDepositAccountBalance()).isEqualTo(800L);
     }
 
     private void dataSetting() {

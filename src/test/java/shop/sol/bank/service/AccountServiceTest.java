@@ -19,9 +19,12 @@ import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.account.AccountRequestDto.AccountSaveRequestDto;
 import shop.sol.bank.handler.ex.CustomApiException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +53,7 @@ class AccountServiceTest extends DummyObject {
     private ObjectMapper om;
 
     @Test
-    void 계좌등록_test() throws Exception {
+    void saveAccount_test() throws Exception {
         // given
         Long userId = 1L;
 
@@ -93,7 +96,8 @@ class AccountServiceTest extends DummyObject {
 
 
         // then (Service의 1.계좌 확인과 3.계좌 삭제는 Repository의 역할이므로 검증을 할 필요가 없다. 그러니 2.계좌 소유자 확인 과정만 테스트 하면 됨)
-        assertThrows(CustomApiException.class, () -> accountService.deleteAccount(number, userId));  // deleteAccount()의 결과 CustomApiException 예외가 발생 될 것을 기대
+        assertThatThrownBy(() -> accountService.deleteAccount(number, userId)).isInstanceOf(CustomApiException.class);
+        // deleteAccount()의 결과 CustomApiException 예외가 발생 될 것을 기대
     }
 
     // 확인할 부분: Account -> balance 변경됬는지, Transaction -> balance 잘 기록됬는지
@@ -175,7 +179,6 @@ class AccountServiceTest extends DummyObject {
         assertThat(account.getBalance()).isEqualTo(1100L);
     }
 
-    // Todo 계좌 출금 테스트
     @Test
     void withdrawAccount_test() throws Exception {
         // given
@@ -199,7 +202,6 @@ class AccountServiceTest extends DummyObject {
         assertThat(ssolAccount.getBalance()).isEqualTo(900L);
     }
 
-    // Todo 계좌 이체 테스트
     @Test
     void transferAccount_test() throws Exception {
         // given
@@ -236,7 +238,63 @@ class AccountServiceTest extends DummyObject {
         assertThat(depositAccount.getBalance()).isEqualTo(1100L);
     }
 
-    // Todo 유저별 계좌 목록보기 테스트
+    @Test
+    void findAccountByUser_test() throws Exception {
+        // given
+        Long userId = 1L;
 
-    // Todo 계좌 상세보기 테스트
+        // stub
+        User ssol = newMockUser(1L, "ssol", "솔");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(ssol));
+
+        Account ssolAccount1 = newMockAccount(1L, 1111L, 1000L, ssol);
+        Account ssolAccount2 = newMockAccount(2L, 2222L, 1000L, ssol);
+        List<Account> accountList = Arrays.asList(ssolAccount1, ssolAccount2);
+        when(accountRepository.findByUser_id(any())).thenReturn(accountList);
+        
+        // when
+        AccountListResponseDto accountListResponseDto = accountService.getAccountByUser(userId);
+        log.debug("list.size() : " + accountListResponseDto.getAccounts().size());
+        log.debug("getFullname() : " + accountListResponseDto.getFullname());
+        
+        // then
+        assertThat(accountListResponseDto.getFullname()).isEqualTo("솔");
+        assertThat(accountListResponseDto.getAccounts().size()).isEqualTo(2);
+    }
+
+    @Test
+    void findDetailAccount_test() throws Exception {
+        // given
+        Long userId = 1L;
+        Long accountNumber = 1111L;
+        int page = 0;
+
+        // stub
+        User ssol = newMockUser(1L, "ssol", "솔");
+        User kim = newMockUser(2L, "kim", "김김김");
+        User lee = newMockUser(3L, "lee", "이이이");
+        Account ssolAccount = newMockAccount(1L, 1111L, 1000L, ssol);
+        Account kimAccount = newMockAccount(2L, 2222L, 1000L, kim);
+        Account leeAccount = newMockAccount(3L, 3333L, 1000L, lee);
+        Transaction withdrawTransaction1 = newMockWithdrawTransaction(1L, ssolAccount);
+        Transaction depositTransaction1 = newMockDepositTransaction(2L, ssolAccount);
+        Transaction transferTransaction1 = newMockTransferTransaction(3L, ssolAccount, kimAccount);
+        Transaction transferTransaction2 = newMockTransferTransaction(4L, ssolAccount, leeAccount);
+        Transaction transferTransaction3 = newMockTransferTransaction(5L, kimAccount, ssolAccount);
+        List<Transaction> transactions = Arrays.asList(withdrawTransaction1, depositTransaction1,
+                transferTransaction1, transferTransaction2, transferTransaction3);
+        when(accountRepository.findByNumber(any())).thenReturn(Optional.of(ssolAccount));
+
+        // stub2
+        when(transactionRepository.findTransactionList(any(), any(), any())).thenReturn(transactions);
+
+        // when
+        AccountDetailResponseDto accountDetailResponseDto = accountService.findDetailAccount(accountNumber, userId, page);
+        String responseBody = om.writeValueAsString(accountDetailResponseDto);
+        log.debug("responseBody : " + responseBody);
+
+        // then
+        assertThat(accountDetailResponseDto.getTransactions().size()).isEqualTo(5);
+        assertThat(accountDetailResponseDto.getBalance()).isEqualTo(900);
+    }
 }
