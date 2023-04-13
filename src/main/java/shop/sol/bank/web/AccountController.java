@@ -54,7 +54,7 @@ public class AccountController {
     public ResponseEntity<?> withdrawAccount(@RequestBody @Valid AccountWithdrawRequestDto accountWithdrawRequestDto,
                                              BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser) {
         AccountWithdrawResponseDto accountWithdrawResponseDto = accountService.withdrawAccount(accountWithdrawRequestDto, loginUser.getUser().getId());
-        return new ResponseEntity<>(new ResponseDto<>(1, "계좌 입금 완료", accountWithdrawResponseDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ResponseDto<>(1, "계좌 출금 완료", accountWithdrawResponseDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/s/accounts/transfer")

@@ -15,7 +15,7 @@ import shop.sol.bank.dto.user.UserResponseDto.JoinResponseDto;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +32,7 @@ class UserServiceTest extends DummyObject {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Test
-    void 회원가입() throws Exception {
+    void joinUser() throws Exception {
         //given
         JoinRequestDto joinRequestDto = new JoinRequestDto();
         joinRequestDto.setUsername("ssol");
@@ -53,7 +53,7 @@ class UserServiceTest extends DummyObject {
         System.out.println("joinResDto = " + joinResponseDto);
 
         // then
-        assertEquals(joinResponseDto.getId(), 1L);
-        assertEquals(joinResponseDto.getUsername(), "ssol");
+        assertThat(joinResponseDto.getId()).isEqualTo(1L);
+        assertThat(joinResponseDto.getUsername()).isEqualTo("ssol");
     }
 }

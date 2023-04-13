@@ -102,6 +102,23 @@ public class DummyObject {
                 .build();
     }
 
+    protected Transaction newMockWithdrawTransaction(Long id, Account account) {
+        account.withdraw(100L);
+        return Transaction.builder()
+                .id(id)
+                .withdrawAccount(account)
+                .depositAccount(null)
+                .withdrawAccountBalance(account.getBalance())
+                .depositAccountBalance(null)
+                .amount(100L)
+                .division(TransactionEnum.WITHDRAW)
+                .sender(account.getNumber() + "")
+                .receiver("ATM")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
     protected Transaction newWithdrawTransaction(Account account, AccountRepository accountRepository) {
         account.withdraw(100L);  // 1000원이 있었다면 1100원이 됨
 
@@ -117,6 +134,24 @@ public class DummyObject {
                 .division(TransactionEnum.WITHDRAW)
                 .sender(account.getNumber() + "")
                 .receiver("ATM")
+                .build();
+    }
+
+    protected Transaction newMockTransferTransaction(Long id, Account withdrawAccount, Account depositAccount) {
+        withdrawAccount.withdraw(100L);
+        depositAccount.deposit(100L);
+        return Transaction.builder()
+                .id(id)
+                .withdrawAccount(withdrawAccount)
+                .depositAccount(depositAccount)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccountBalance(depositAccount.getBalance())
+                .amount(100L)
+                .division(TransactionEnum.TRANSFER)
+                .sender(withdrawAccount.getNumber() + "")
+                .receiver(depositAccount.getNumber() + "")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 

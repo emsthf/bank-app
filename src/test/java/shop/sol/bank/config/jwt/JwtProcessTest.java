@@ -5,7 +5,7 @@ import shop.sol.bank.config.auth.LoginUser;
 import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserEnum;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtProcessTest {
 
@@ -30,7 +30,7 @@ class JwtProcessTest {
         System.out.println("jwtToken = " + jwtToken);
 
         // then
-        assertTrue(jwtToken.startsWith(JwtVO.TOKEN_PREFIX));
+        assertThat(jwtToken).startsWith(JwtVO.TOKEN_PREFIX);
     }
     
     @Test
@@ -45,8 +45,8 @@ class JwtProcessTest {
         System.out.println("loginUser.getUser().getRole() = " + loginUser.getUser().getRole());
         
         // then
-        assertEquals(1L, (long) loginUser.getUser().getId());
-        assertEquals(UserEnum.ADMIN, loginUser.getUser().getRole());
+        assertThat(loginUser.getUser().getId()).isEqualTo(1L);
+        assertThat(loginUser.getUser().getRole()).isEqualTo(UserEnum.ADMIN);
     }
 
 }

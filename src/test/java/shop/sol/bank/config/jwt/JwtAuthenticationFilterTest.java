@@ -16,8 +16,8 @@ import shop.sol.bank.domain.user.User;
 import shop.sol.bank.domain.user.UserRepository;
 import shop.sol.bank.dto.user.UserRequestDto.LoginRequestDto;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,8 +60,8 @@ class JwtAuthenticationFilterTest extends DummyObject {
 
         // then
         resultActions.andExpect(status().isOk());
-        assertNotNull(jwtToken);
-        assertTrue(jwtToken.startsWith(JwtVO.TOKEN_PREFIX));
+        assertThat(jwtToken).isNotNull();
+        assertThat(jwtToken).startsWith(JwtVO.TOKEN_PREFIX);
         resultActions.andExpect(jsonPath("$.data.username").value("ssol"));
     }
 
